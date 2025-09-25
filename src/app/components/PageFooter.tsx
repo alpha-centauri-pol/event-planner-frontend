@@ -1,13 +1,12 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
 
 type PageFooterProps = {
   selectedCount: number;
+  onContinue: () => void; 
 };
 
-const PageFooter: React.FC<PageFooterProps> = ({ selectedCount }) => {
-  const router = useRouter();
+const PageFooter: React.FC<PageFooterProps> = ({ selectedCount, onContinue }) => {
   const remaining = Math.max(0, 3 - selectedCount);
   const isDisabled = selectedCount < 3;
 
@@ -20,7 +19,7 @@ const PageFooter: React.FC<PageFooterProps> = ({ selectedCount }) => {
       </p>
 
       <button
-        onClick={() => !isDisabled && router.push("/home")}
+        onClick={onContinue} 
         disabled={isDisabled}
         className={`px-6 py-2 rounded-lg font-semibold text-white ${
           isDisabled
