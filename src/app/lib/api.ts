@@ -16,6 +16,7 @@ api.interceptors.response.use(
 export const fetchProfile = () => api.get('/users/me/profile');
 export const fetchEvents = () => api.get('/events/');
 export const fetchAllInterests = () => api.get('/interests/');
+export const fetchUserInterests = () => api.get('/interests/me');
 export const saveUserInterests = (interestIds: string[]) => api.put('/interests/me', { interest_ids: interestIds });
 export const createCustomInterest = (name: string) => api.post('/interests/me/custom', { name });
 export const syncInterests = () => api.post('/interests/sync');

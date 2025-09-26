@@ -7,30 +7,18 @@ import TimelineDay from '../components/TimelineDay';
 import CustomDropdown, { DropdownOption } from '../components/CustomDropdown';
 import Modal from '../components/Modal';
 import ProfileSection from '../components/ProfileSection';
-import { fetchEvents } from '../lib/api';
-import { FiSearch, FiUser } from 'react-icons/fi';
+import { fetchEvents, syncInterests } from '../lib/api';
+import { FiRefreshCcw, FiSearch, FiUser } from 'react-icons/fi';
 
 const sortChoices: DropdownOption[] = [
     { value: 'time', label: 'Sort by Time' },
     { value: 'title', label: 'Sort by Title' },
 ];
 
-type EventData = {
-    id: string;
-    title: string;
-    description: string;
-    location: string;
-    platform: string;
-    link: string;
-    startTime: string; // This is an ISO date string
-    endTime: string;
-    source: string;
-    sourceId: string;
-};
-
 const HomePage = () => {
     const [allEvents, setAllEvents] = useState<Event[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     
     const [search, setSearch] = useState('');
@@ -40,40 +28,45 @@ const HomePage = () => {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isProfileOpen, setProfileOpen] = useState(false);
 
-    useEffect(() => {
-        const loadEvents = async () => {
-            try {
-                const response = await fetchEvents();
-                const eventData = response.data;
-
-                // Changed 'evt' to 'event' for better readability
-                const formattedEvents = eventData.map((event: EventData) => ({
-                    ...event,
-                    date: event.startTime.split('T')[0],
-                    time: new Date(event.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-                    locationDetail: event.location,
-                    locationType: event.platform === 'online' ? 'Online' : 'In-person'
-                }));
-                
-                setAllEvents(formattedEvents);
-
-            } catch (err) {
-                console.error("Failed to fetch events:", err);
-                setError("Could not load events. Please try again later.");
-            } finally {
-                setIsLoading(false);
+    const loadEvents = async () => {
+        try {
+            const response = await fetchEvents();
+            if (!Array.isArray(response)) {
+                throw new Error("Invalid data format from server.");
             }
-        };
+            setAllEvents(response);
+        } catch (err) {
+            console.error("Failed to fetch events:", err);
+            setError("Could not load events. Please try again later.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         loadEvents();
     }, []);
+
+    const handleSyncInterests = async () => {
+        setIsSyncing(true);
+        try {
+            await syncInterests();
+            await loadEvents();
+            alert("Sync complete! Your events have been updated.");
+        } catch (err) {
+            console.error("Failed to sync interests:", err);
+            alert("Could not sync interests at this time.");
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const displayedEvents = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         const filteredEvents = allEvents.filter(event => {
-            const eventDate = new Date(event.date);
+            const eventDate = new Date(event.startTime);
             const matchesDate = show === 'upcoming' ? eventDate >= today : eventDate < today;
             const matchesSearch = !search || 
                                   event.title.toLowerCase().includes(search.toLowerCase()) || 
@@ -83,11 +76,11 @@ const HomePage = () => {
 
         filteredEvents.sort((a, b) => {
             if (sort === 'title') return a.title.localeCompare(b.title);
-            return a.time.localeCompare(b.time);
+            return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
         });
 
         return filteredEvents.reduce((acc, event) => {
-            const dateKey = event.date;
+            const dateKey = event.startTime.split('T')[0];
             if (!acc[dateKey]) acc[dateKey] = [];
             acc[dateKey].push(event);
             return acc;
@@ -133,15 +126,31 @@ const HomePage = () => {
             })
         );
     };
+
+    const formatTime = (isoString: string) => {
+        if (!isoString) return '';
+        return new Date(isoString).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        });
+    };
   
     return (
-        <div className="min-h-screen text-white p-8 font-sans bg-[#161616]">
+        <div className="min-h-screen text-white p-8 font-sans">
             <div className="max-w-5xl mx-auto">
                 <Header
-                    leftContent={<button className="text-2xl cursor-pointer hover:text-gray-300">←</button>}
+                    leftContent=""
                     title="All Events"
                     rightContent={
                         <div className="flex items-center space-x-4">
+                            <button 
+                                onClick={handleSyncInterests} 
+                                disabled={isSyncing}
+                                className="w-10 h-10 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <FiRefreshCcw className={`w-5 h-5 text-[#A6A2FF] ${isSyncing ? 'animate-spin' : ''}`} />
+                            </button>
                             <button onClick={() => setProfileOpen(true)} className="w-10 h-10 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700">
                                 <FiUser className="w-5 h-5 text-[#A6A2FF]" />
                             </button>
@@ -174,15 +183,24 @@ const HomePage = () => {
                     {selectedEvent && (
                       <div className="text-white p-4">
                         <h2 className="text-xl font-bold mb-4">{selectedEvent.title}</h2>
-                        <p className="text-base text-gray-300 mb-2">{formatDateDetails(selectedEvent.date).weekday}, {formatDateDetails(selectedEvent.date).label} at {selectedEvent.time}</p>
+                        <p className="text-base text-gray-300 mb-2">{formatDateDetails(selectedEvent.startTime).weekday}, {formatDateDetails(selectedEvent.startTime).label} at {formatTime(selectedEvent.startTime)}</p>
                         <p className="text-base my-4">{selectedEvent.description}</p>
-                        <p className="text-base"><span className="font-semibold">Location:</span> {selectedEvent.locationType === 'Online' ? 'Online' : selectedEvent.locationDetail}</p>
-                         {selectedEvent.locationType === 'Online' && <p className="text-sm text-blue-400">{selectedEvent.locationDetail}</p>}
+                        <p className="text-base">
+                          <span className="font-semibold">Location:</span> {selectedEvent.platform === 'Online' ? selectedEvent.platform : selectedEvent.location}
+                        </p>
+                        {selectedEvent.link && selectedEvent.platform === 'Online' && (
+                            <a href={selectedEvent.link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:underline break-all">
+                                {selectedEvent.link}
+                            </a>
+                        )}
+                        <p className="text-base mt-2">
+                          <span className="font-semibold">Time:</span> {formatTime(selectedEvent.startTime)} - {formatTime(selectedEvent.endTime)}
+                        </p>
                       </div>
                     )}
                 </Modal>
                 <Modal isOpen={isProfileOpen} onClose={() => setProfileOpen(false)}>
-                    <ProfileSection />
+                    <ProfileSection/>
                 </Modal>
             </div>
         </div>

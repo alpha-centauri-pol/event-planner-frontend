@@ -11,7 +11,7 @@ const PageFooter: React.FC<PageFooterProps> = ({ selectedCount, onContinue }) =>
   const isDisabled = selectedCount < 3;
 
   return (
-    <footer className="flex justify-between items-center p-5 bg-[#1D1C2C] rounded-xl mt-4 border-2 border-[#5D59AD]">
+    <footer className="flex justify-between items-center p-5 bg-[#1D1C2C] rounded-xl mt-4 border-2 border-[#5D59AD] w-full max-w-5xl mx-auto">
       <p className="font-semibold text-white text-[16px]">
         {isDisabled
           ? `Select at least ${remaining} interest${remaining > 1 ? "s" : ""}`
