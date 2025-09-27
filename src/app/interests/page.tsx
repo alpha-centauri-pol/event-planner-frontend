@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import InterestCategory from '../components/InterestCategory';
 import PageFooter from '../components/PageFooter';
@@ -8,12 +8,14 @@ import Modal from '../components/Modal';
 import InterestTag from '../components/InterestTag';
 import ProfileSection from '../components/ProfileSection';
 import Header from '../components/Header';
-import { fetchAllInterests, fetchUserInterests, createCustomInterest, syncInterests, saveUserInterests } from '../lib/api'; 
+import { fetchAllInterests, fetchUserInterests, createCustomInterest, syncInterests, saveUserInterests, fetchProfile } from '../lib/api'; 
+import CustomInterestTag from '../components/CustomInterestTag';
 import { FiBell, FiUser } from 'react-icons/fi';
 import RootLayout from '../layout';
 
 const InterestsPage = () => {
   const router = useRouter();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [interestData, setInterestData] = useState<Record<string, string[]>>({});
   const [interestMap, setInterestMap] = useState<Record<string, string>>({});
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -22,48 +24,61 @@ const InterestsPage = () => {
   const [customInterestText, setCustomInterestText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [customInterests, setCustomInterests] = useState<string[]>([]);
+
+
+  const loadInitialData = async () => {
+    try {
+      const [allInterestsResponse, myInterestsResponse, myProfile] = await Promise.all([
+        fetchAllInterests(),
+        fetchUserInterests(),
+        fetchProfile()
+      ]);
+
+      const myCustomInterests = myProfile.data.custom_interests || [];
+      const allInterests = allInterestsResponse.data
+      const myInterests = myInterestsResponse.data
+      if (!Array.isArray(allInterests) || !Array.isArray(myInterests)) {
+        throw new Error("Invalid data format received from the server.");
+      }
+
+      const previouslySelectedNames: string[] = [];
+
+      // myCustomInterests.forEach((custom: { id: string, name: string }) => {
+      //   previouslySelectedNames.push(custom.name);
+      //   allInterests.unshift({ id: custom.id, category: 'Custom Interest', child: custom.name });
+      // });
+
+      myInterests.forEach((interest: { child: string }) => {
+        previouslySelectedNames.push(interest.child);
+      });
+      
+
+      const grouped: Record<string, string[]> = {};
+      const iMap: Record<string, string> = {};
+
+      allInterests.forEach((interest: { id: string, category: string, child: string }) => {
+        if (!grouped[interest.category]) {
+          grouped[interest.category] = [];
+        }
+        grouped[interest.category].push(interest.child);
+        iMap[interest.child] = interest.id;
+      });
+
+      setCustomInterests(myCustomInterests.map((ci: { id: string, name: string }) => ci.name));
+      setSelectedInterests(previouslySelectedNames);
+      setInterestData(grouped);
+      setInterestMap(iMap);
+
+    } catch (err) {
+      console.error("Failed to load initial data:", err);
+      setError("Could not load your interests. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const [allInterestsResponse, myInterestsResponse] = await Promise.all([
-          fetchAllInterests(),
-          fetchUserInterests()
-        ]);
-
-        
-        const allInterests = allInterestsResponse
-        const myInterests = myInterestsResponse
-
-        if (!Array.isArray(allInterests) || !Array.isArray(myInterests)) {
-          throw new Error("Invalid data format received from the server.");
-        }
-
-        const previouslySelectedNames = myInterests.map((interest: { child: string }) => interest.child);
-
-        const grouped: Record<string, string[]> = {};
-        const iMap: Record<string, string> = {};
-
-        allInterests.forEach((interest: { id: string, category: string, child: string }) => {
-          if (!grouped[interest.category]) {
-            grouped[interest.category] = [];
-          }
-          grouped[interest.category].push(interest.child);
-          iMap[interest.child] = interest.id;
-        });
-        
-        setSelectedInterests(previouslySelectedNames);
-        setInterestData(grouped);
-        setInterestMap(iMap);
-
-      } catch (err) {
-        console.error("Failed to load initial data:", err);
-        setError("Could not load your interests. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadInitialData();
   }, []);
 
@@ -76,16 +91,19 @@ const InterestsPage = () => {
   };
 
   const handleAddCustomInterest = async () => {
-    if (!customInterestText.trim()) return;
+    if (!customInterestText.trim()) {
+      return;
+    }
+  
     try {
-      const newInterest = await createCustomInterest(customInterestText.trim());
-      
-      setSelectedInterests(prev => [...prev, newInterest.name]);
-      setInterestMap(prevMap => ({ ...prevMap, [newInterest.name]: newInterest.id }));
-      setInterestData(prevData => ({
-        ...prevData,
-        Custom: [...(prevData.Custom || []), newInterest.name],
-      }));
+      await createCustomInterest(customInterestText.trim());
+      await loadInitialData();
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+        }
+      }, 100);
+  
     } catch (err) {
       console.error("Failed to create custom interest:", err);
       alert("Could not add custom interest.");
@@ -123,16 +141,22 @@ const InterestsPage = () => {
           }
         />
         <div className="mt-8 w-full bg-[#1D1C2C] text-gray-200 rounded-2xl p-6 md:p-8 border-2 border-[#5D59AD] max-h-[65vh] overflow-auto">
-          <main>
+          <main ref={scrollContainerRef}>
             <h2 className="text-lg font-semibold text-white mb-5">Explore by Category</h2>
-            {isLoading && <p className="text-gray-400">Loading interests...</p>}
-            {error && <p className="text-red-400">{error}</p>}
-            {!isLoading && !error && Object.entries(interestData).map(([category, interests]) => (
-              <InterestCategory key={category} title={category} interests={interests} selectedInterests={selectedInterests} onInterestClick={handleToggleInterest} />
-            ))}
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-start mt-4 mb-4">
               <InterestTag label="Custom Interest" isSelected={false} onClick={() => setCustomInterestModalOpen(true)} />
             </div>
+            {isLoading && <p className="text-gray-400">Loading interests...</p>}
+            
+            {error && <p className="text-red-400">{error}</p>}
+            {!isLoading && !error && customInterests.length > 0 && (
+              <InterestCategory title="Custom Interests" interests={customInterests} selectedInterests={customInterests} onInterestClick={handleToggleInterest} isCustom={true} />
+            )}
+            {!isLoading && !error && Object.entries(interestData).map(([category, interests]) => (
+              
+              <InterestCategory key={category} title={category} interests={interests} selectedInterests={selectedInterests} onInterestClick={handleToggleInterest} isCustom={false} />
+            ))}
+            
           </main>
           
           

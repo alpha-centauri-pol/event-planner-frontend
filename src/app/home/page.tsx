@@ -29,12 +29,13 @@ const HomePage = () => {
     const [isProfileOpen, setProfileOpen] = useState(false);
 
     const loadEvents = async () => {
+        setIsLoading(true);
         try {
             const response = await fetchEvents();
-            if (!Array.isArray(response)) {
+            if (!Array.isArray(response.data)) {
                 throw new Error("Invalid data format from server.");
             }
-            setAllEvents(response);
+            setAllEvents(response.data);
         } catch (err) {
             console.error("Failed to fetch events:", err);
             setError("Could not load events. Please try again later.");
@@ -52,7 +53,7 @@ const HomePage = () => {
         try {
             await syncInterests();
             await loadEvents();
-            alert("Sync complete! Your events have been updated.");
+            alert("Sync complete! Your events will be updated in a few minutes.");
         } catch (err) {
             console.error("Failed to sync interests:", err);
             alert("Could not sync interests at this time.");
@@ -111,7 +112,7 @@ const HomePage = () => {
                 return (
                     <div key={dateKey} className="flex gap-6">
                         <TimelineDay date={dayInfo.label} dayOfWeek={dayInfo.weekday} isToday={dayInfo.isToday} />
-                        <div className="flex-grow space-y-4 border-l-2 border-gray-700/50 pl-6">
+                        <div className="flex-grow flex-row max w-100 space-y-4 border-l-2 border-gray-700/50 pl-6">
                             {displayedEvents[dateKey].map(event => (
                                 <EventCard 
                                     key={event.id}
@@ -207,3 +208,4 @@ const HomePage = () => {
     );
 };
 export default HomePage;
+
