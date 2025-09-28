@@ -1,12 +1,12 @@
 import React from 'react';
-import { FiPlus } from 'react-icons/fi';
+// import { FiPlus } from 'react-icons/fi';
 
 type InterestTagProps = {
   label: string;
   isSelected: boolean;
 };
 
-const CustomInterestTag: React.FC<InterestTagProps> = ({ label, isSelected, }) => {
+const CustomInterestTag: React.FC<InterestTagProps> = ({ label }) => {
   return (
     <div
       className="flex items-center justify-between min-w-[160px] text-left

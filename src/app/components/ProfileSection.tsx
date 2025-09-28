@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image  from 'next/image';
 import { FiEdit, FiLogOut, FiX } from 'react-icons/fi';
 import { fetchProfile, logoutUser, deleteCustomInterest } from '../lib/api';
 
@@ -93,7 +94,7 @@ const ProfileSection = () => {
     <div className="w-full max-w-lg h-[85vh] max-h-[600px] rounded-2xl bg-[#1D1C2C] p-6 shadow-xl text-white font-sans flex flex-col">
       <div className="flex-shrink-0">
         <div className="flex items-center gap-5 mb-6">
-          <img 
+          <Image
             src={user.picture} 
             alt="User Avatar" 
             className="w-20 h-20 rounded-full border-2 border-[#A6A2FF]"
