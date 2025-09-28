@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { clsx } from 'clsx';
+// import { clsx } from 'clsx';
 import { FiChevronDown } from 'react-icons/fi';
 
 type AccordionProps = {

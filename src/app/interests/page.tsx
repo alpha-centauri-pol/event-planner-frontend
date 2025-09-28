@@ -9,9 +9,9 @@ import InterestTag from '../components/InterestTag';
 import ProfileSection from '../components/ProfileSection';
 import Header from '../components/Header';
 import { fetchAllInterests, fetchUserInterests, createCustomInterest, syncInterests, saveUserInterests, fetchProfile } from '../lib/api'; 
-import CustomInterestTag from '../components/CustomInterestTag';
-import { FiBell, FiUser } from 'react-icons/fi';
-import RootLayout from '../layout';
+// import CustomInterestTag from '../components/CustomInterestTag';
+// import { FiBell, FiUser } from 'react-icons/fi';
+// import RootLayout from '../layout';
 
 const InterestsPage = () => {
   const router = useRouter();

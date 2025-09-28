@@ -45,6 +45,7 @@ export async function middleware(request: NextRequest) {
       }
 
     } catch (error) {
+      console.error('Error validating session:', error);
       const response = NextResponse.redirect(new URL('/login', request.url));
       response.cookies.delete('connect.sid');
       return response;
