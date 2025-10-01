@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { FcGoogle } from "react-icons/fc"; 
+import { API_BASE_URL } from '../config/constants';
 
 const LoginPage = () => {
-  const backendUrl = 'https://event-tracker-v2.onrender.com';
+  const backendUrl = API_BASE_URL;
 
   const handleGoogleLogin = () => {
     window.location.href = `${backendUrl}/auth/google/login`;

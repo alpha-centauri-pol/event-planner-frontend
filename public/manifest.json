@@ -1,0 +1,46 @@
+{
+  "name": "SynCal - Smart Event Planning & Management",
+  "short_name": "SynCal",
+  "description": "Discover and manage events effortlessly with personalized recommendations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#161616",
+  "theme_color": "#5D59AD",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "description": "Go to home page",
+      "url": "/home",
+      "icons": [
+        {
+          "src": "./favicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Interests",
+      "short_name": "Interests",
+      "description": "Manage your interests",
+      "url": "/interests",
+      "icons": [
+        {
+          "src": "./favicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
