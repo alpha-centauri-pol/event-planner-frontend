@@ -15,7 +15,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="max-w-7xl w-full mx-auto flex items-center justify-between px-6 py-4 bg-[#161616] text-white shadow-md">
+    <nav className="max-w-7xl w-full mx-auto flex items-center justify-between px-6 py-4 text-white shadow-md">
       <div
         className="text-2xl font-bold cursor-pointer"
         onClick={() => router.push("/")}
