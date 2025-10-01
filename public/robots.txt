@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow protected routes
+Disallow: /api/
+Disallow: /login
+
+# Sitemap
+Sitemap: https://event-planner-frontend-upb7.onrender.com/sitemap.xml
