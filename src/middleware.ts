@@ -20,9 +20,17 @@ export async function middleware(request: NextRequest) {
         headers: {
           Cookie: `${sessionCookie.name}=${sessionCookie.value}`,
         },
+        credentials: "include",
       });
 
       if (!response.ok) {
+        if (isProtectedRoute) {
+          const redirectResponse = NextResponse.redirect(
+            new URL("/login", request.url)
+          );
+          redirectResponse.cookies.delete(SESSION_COOKIE_NAME);
+          return redirectResponse;
+        }
         throw new Error("Session is not valid");
       }
 
