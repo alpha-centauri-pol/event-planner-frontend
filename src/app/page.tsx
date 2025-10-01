@@ -1,47 +1,63 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "@/app/components/Navbar";
 
-const RootRedirectInner = () => {
+export default function LandingPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const loginStatus = searchParams.get("login");
-    const userId = searchParams.get("user_id");
-
-    if (loginStatus === "success" && userId) {
-      try {
-        localStorage.setItem("user_id", userId);
-      } catch (e) {
-        console.warn("Unable to store user_id in localStorage", e);
+    try {
+      const userId = localStorage.getItem("user_id");
+      if (userId) {
+        setIsLoggedIn(true);
       }
-      router.replace("/home");
-    } else {
-      router.replace("/login");
+    } catch (e) {
+      console.warn("Unable to read localStorage", e);
     }
-  }, [router, searchParams]);
+  }, []);
+
+  const handleClick = () => {
+    if (isLoggedIn) {
+      router.push("/home");
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#161616] text-white">
-      <p>Redirecting...</p>
+    <div className="min-h-screen flex flex-col bg-[#161616] text-white">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Hero Section */}
+      <div className="flex flex-col flex-1 items-center justify-center px-6">
+        <div className="text-center max-w-4xl">
+          <h1 className="text-4xl md:text-7xl font-bold mb-6">
+            Intelligent Automation For Your Mail Inbox
+          </h1>
+          <p className="text-lg max-w-xl mx-auto text-gray-300 mb-5">
+            We bring AI email automation to your fingertips & streamline
+            planning your events based on your private, personal interests.
+          </p>
+          <button
+            onClick={handleClick}
+            className="px-4 py-2 bg-[#5c58aa] rounded-md text-lg font-semibold transition-colors cursor-pointer mx-2 hover:bg-[#4a4690]"
+          >
+            Get Started
+          </button>
+          <a
+            href="https://www.dscvit.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-[0.75rem] bg-[#0a0a0a] rounded-md text-lg font-semibold transition-colors mx-2 hover:bg-[#1a1a1a]"
+          >
+            About GDG
+          </a>
+        </div>
+      </div>
     </div>
   );
-};
-
-const RootRedirectorPage = () => {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#161616] text-white">
-          <p>Loading...</p>
-        </div>
-      }
-    >
-      <RootRedirectInner />
-    </Suspense>
-  );
-};
-
-export default RootRedirectorPage;
+}
