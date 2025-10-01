@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Navbar() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Navbar() {
         className="text-2xl font-bold cursor-pointer"
         onClick={() => router.push("/")}
       >
-        SynCal
+        <Image src="/logo.svg" alt="Logo" width={140} height={140} />
       </div>
 
       <button
