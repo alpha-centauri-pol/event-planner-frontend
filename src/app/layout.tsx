@@ -11,11 +11,11 @@ const satoshi = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "SynCal",
-    template: "%s | SynCal",
+    default: "SynCule",
+    template: "%s | SynCule",
   },
   description:
-    "Discover and manage events effortlessly with SynCal. Your intelligent event planning companion that helps you track, organize, and never miss important moments. Personalized event recommendations based on your interests.",
+    "Discover and manage events effortlessly with SynCule. Your intelligent event planning companion that helps you track, organize, and never miss important moments. Personalized event recommendations based on your interests.",
   keywords: [
     "event planner",
     "event management",
@@ -41,24 +41,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_URL || "http://localhost:3000",
-    siteName: "SynCal",
-    title: "SynCal - Smart Event Planning & Management",
+    siteName: "SynCule",
+    title: "SynCule - Smart Event Planning & Management",
     description:
-      "Discover and manage events effortlessly with SynCal. Your intelligent event planning companion with personalized recommendations.",
+      "Discover and manage events effortlessly with SynCule. Your intelligent event planning companion with personalized recommendations.",
     images: [
       {
         url: "/public/logo.svg",
         width: 1200,
         height: 630,
-        alt: "SynCal - Event Planning Made Simple",
+        alt: "SynCule - Event Planning Made Simple",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SynCal - Smart Event Planning & Management",
+    title: "SynCule - Smart Event Planning & Management",
     description:
-      "Discover and manage events effortlessly with SynCal. Your intelligent event planning companion.",
+      "Discover and manage events effortlessly with SynCule. Your intelligent event planning companion.",
     images: ["/public/logo.svg"],
     creator: "@GDG-VIT",
   },
