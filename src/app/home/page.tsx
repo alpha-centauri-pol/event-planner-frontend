@@ -110,9 +110,9 @@ const HomePage = () => {
             Object.keys(displayedEvents).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(dateKey => {
                 const dayInfo = formatDateDetails(dateKey);
                 return (
-                    <div key={dateKey} className="flex gap-6">
+                    <div key={dateKey} className="block md:flex md:gap-6">
                         <TimelineDay date={dayInfo.label} dayOfWeek={dayInfo.weekday} isToday={dayInfo.isToday} />
-                        <div className="flex-grow flex-row max w-100 space-y-4 border-l-2 border-gray-700/50 pl-6">
+                        <div className="flex-grow w-full space-y-4 md:border-l-2 border-gray-700/50 pl-0 md:pl-6 mt-4 md:mt-0">
                             {displayedEvents[dateKey].map(event => (
                                 <EventCard 
                                     key={event.id}
@@ -138,21 +138,26 @@ const HomePage = () => {
     };
   
     return (
-        <div className="min-h-screen text-white p-8 font-sans">
+        <div className="min-h-screen text-white p-4 sm:p-8 font-sans">
             <div className="max-w-5xl mx-auto">
                 <Header
                     leftContent=""
                     title="All Events"
                     rightContent={
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2 sm:space-x-4">
                             <button 
                                 onClick={handleSyncInterests} 
                                 disabled={isSyncing}
-                                className="w-10 h-10 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-11 h-11 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                aria-label="Sync interests"
                             >
                                 <FiRefreshCcw className={`w-5 h-5 text-[#A6A2FF] ${isSyncing ? 'animate-spin' : ''}`} />
                             </button>
-                            <button onClick={() => setProfileOpen(true)} className="w-10 h-10 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700">
+                            <button 
+                                onClick={() => setProfileOpen(true)} 
+                                className="w-11 h-11 rounded-full border-2 border-[#A6A2FF] bg-[#161616] flex items-center justify-center hover:bg-gray-700"
+                                aria-label="Open profile"
+                            >
                                 <FiUser className="w-5 h-5 text-[#A6A2FF]" />
                             </button>
                         </div>
@@ -166,15 +171,20 @@ const HomePage = () => {
                             placeholder="Search events..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-[#1D1C2C] border-2 border-[#312E72] rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-white"
+                            className="w-full bg-[#1D1C2C] border-2 border-[#312E72] rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-white hover:border-[#5D59AD]"
                         />
                     </div>
-                    <div className="flex items-center gap-4 h-full">
-                        <div className="flex flex-grow h-full bg-[#1D1C2C] rounded-lg items-stretch border-[#312E72] border-2">
-                            <button onClick={() => setShow('upcoming')} className={`px-4 py-3.5 text-sm font-semibold rounded-md ${show === 'upcoming' ? 'bg-[#5D59AD]' : ''}`}>Upcoming</button>
-                            <button onClick={() => setShow('past')} className={`px-4 py-3 text-sm font-semibold rounded-md ${show === 'past' ? 'bg-[#5D59AD]' : ''}`}>Past</button>
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                        <div className="flex w-full sm:w-auto h-full bg-[#1D1C2C] rounded-lg items-stretch border-[#312E72] border-2">
+                            <button onClick={() => setShow('upcoming')} className={`flex-1 sm:flex-initial px-4 py-4 text-sm font-semibold rounded-md ${show === 'upcoming' ? 'bg-[#5D59AD]' : 'hover:bg-[#5D59AD]/30'}`}>Upcoming</button>
+                            <button onClick={() => setShow('past')} className={`flex-1 sm:flex-initial px-4 py-4 text-sm font-semibold rounded-md ${show === 'past' ? 'bg-[#5D59AD]' : 'hover:bg-[#5D59AD]/30'}`}>Past</button>
                         </div>
-                        <CustomDropdown options={sortChoices} value={sort} onChange={(value) => setSort(value as 'time' | 'title')} className="w-48" />
+                        <CustomDropdown 
+                            options={sortChoices} 
+                            value={sort} 
+                            onChange={(value) => setSort(value as 'time' | 'title')} 
+                            className="w-full sm:w-48"
+                        />
                     </div>
                 </div>
                 <div className="mt-12 space-y-8">
@@ -208,4 +218,3 @@ const HomePage = () => {
     );
 };
 export default HomePage;
-

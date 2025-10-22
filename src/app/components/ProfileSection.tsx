@@ -34,6 +34,7 @@ const ProfileSection = () => {
       } catch (error) {
         console.error("Failed to fetch profile:", error);
         router.push('/login');
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -65,10 +66,9 @@ const ProfileSection = () => {
     try {
       await logoutUser();
     } catch (error) {
-      console.error("Logout failed but redirecting anyway.", error);}
-    // } finally {
-    //   window.location.href = '/login';
-    // }
+      console.error("Logout failed but redirecting anyway.", error);
+    }
+    window.location.href = '/login';
   };
 
   if (loading) {
@@ -115,12 +115,12 @@ const ProfileSection = () => {
             </span>
           ))}
           {user.custom_interests?.map((interest) => (
-            <div key={interest.id} className="flex items-center bg-[#4a486d] text-[#E0DFFF] text-sm font-medium pl-3 pr-2 py-1.5 rounded-full">
+            <div key={interest.id} className="flex items-center bg-[#4a486d] text-[#E0DFFF] text-sm font-medium pl-3 rounded-full">
               <span>{interest.name}</span>
               <button 
                 onClick={() => handleDeleteCustomInterest(interest.id)} 
                 aria-label={`Remove ${interest.name} interest`}
-                className="ml-2 text-gray-400 hover:text-white"
+                className="ml-2 p-3.5 rounded-full text-gray-400 hover:text-white"
               >
                 <FiX size={16} />
               </button>
@@ -133,7 +133,7 @@ const ProfileSection = () => {
         <div className="mt-8 space-y-4 border-t border-gray-700/50 pt-6">
           <button
             onClick={handleChangeInterests}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 font-semibold text-white bg-[#5D59AD] rounded-lg hover:bg-[#4844A2] transition-colors duration-300"
+            className="w-full flex items-center justify-center gap-2 px-4 py-4 font-semibold text-white bg-[#5D59AD] rounded-lg hover:bg-[#4844A2] transition-colors duration-300"
           >
             <FiEdit />
             <span>Change Interests</span>
@@ -152,4 +152,3 @@ const ProfileSection = () => {
 };
 
 export default ProfileSection;
-
