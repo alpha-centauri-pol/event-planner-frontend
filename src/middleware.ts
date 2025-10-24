@@ -51,9 +51,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/interests", request.url));
       }
 
-      if (!isNewUser && pathname.startsWith("/interests")) {
-        return NextResponse.redirect(new URL("/home", request.url));
-      }
+      // if (!isNewUser && pathname.startsWith("/interests")) {
+      //   return NextResponse.redirect(new URL("/home", request.url));
+      // }
     } catch (error) {
       console.error("Error validating session:", error);
     }
