@@ -14,6 +14,9 @@ export default function Navbar() {
       router.push("/login");
     }
   };
+  const handlePrivacyPolicy= () => {
+      router.push("/privacy");
+  };
 
   return (
     <nav className="max-w-7xl w-full mx-auto flex items-center justify-between px-6 py-4 text-white shadow-md">
@@ -23,6 +26,13 @@ export default function Navbar() {
       >
         <Image src="/logo.svg" alt="Logo" width={140} height={140} />
       </div>
+      <div className="flex">
+      <button
+        onClick={handlePrivacyPolicy}
+        className="px-4 py-[0.75rem] rounded-md text-lg font-semibold transition-colors mx-2 hover:text-[#e3e3e3]"
+      >
+        Privacy Policy
+      </button>
 
       <button
         onClick={handleGetStarted}
@@ -30,6 +40,8 @@ export default function Navbar() {
       >
         Get Started
       </button>
+      </div>
+
     </nav>
   );
 }
