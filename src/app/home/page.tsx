@@ -112,7 +112,7 @@ const HomePage = () => {
                 return (
                     <div key={dateKey} className="block md:flex md:gap-6">
                         <TimelineDay date={dayInfo.label} dayOfWeek={dayInfo.weekday} isToday={dayInfo.isToday} />
-                        <div className="flex-grow w-full space-y-4 md:border-l-2 border-gray-700/50 pl-0 md:pl-6 mt-4 md:mt-0">
+                        <div className="flex-grow w-full max-w-3xl space-y-4 md:border-l-2 border-gray-700/50 pl-0 md:pl-6 mt-4 md:mt-0">
                             {displayedEvents[dateKey].map(event => (
                                 <EventCard 
                                     key={event.id}
